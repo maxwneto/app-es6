@@ -1,14 +1,17 @@
+//importar arquivo api para utilizar axios para consumo da api do github
+import api from './api';
+
 class App {
     //crio construtor
     constructor() {
         //crio vetor para receber objetos/repositorios
         this.repositories = [];
         
-        //crio objeto que irá receber referencia do ids form e ul
+        //crio objeto que irá receber referencia do objeto existente no DOM
         this.formEL = document.querySelector('#repo-form');
+        this.inputEl = document.querySelector('input[name=repository');
         this.listEl = document.querySelector('#repo-list');
 
-        //
         this.registerHandler();
     }
 
@@ -19,14 +22,25 @@ class App {
     }
 
     //metodo repositorio  instancia objetos no vetor repositories
-    addRepository(event) {
+    async addRepository(event) {
         event.preventDefault();
+        //cria objeto para receber o valor do input do DOM
+        const repoInput = this.inputEl.value;
+
+        //validar se input contém valor
+        if(repoInput.length === 0){
+            return;
+        }
+
+        const response = await api.get(`/repos${repoInput}`);
+
+        console.log(response);
 
         this.repositories.push({
             name: 'https://github.com/maxwneto',
             description: 'Especialista em identificar oportunidades para transforção Digital',
             avatar_url: 'https://avatars0.githubusercontent.com/u/28929274?v=4',
-            html_url: 'https://github.com/maxwneto/app-es6',
+            html_url: 'http://github.com/Rocketseat/curso-es6',
 
         });
         //chamada do metodo render
