@@ -32,17 +32,23 @@ class App {
             return;
         }
 
-        const response = await api.get(`/repos${repoInput}`);
+        const response = await api.get(`https://api.github.com/repos/${repoInput}`);
 
+        //logar no console dados do repositóiro
         console.log(response);
 
-        this.repositories.push({
-            name: 'https://github.com/maxwneto',
-            description: 'Especialista em identificar oportunidades para transforção Digital',
-            avatar_url: 'https://avatars0.githubusercontent.com/u/28929274?v=4',
-            html_url: 'http://github.com/Rocketseat/curso-es6',
+        //desestruturação
+        const {name,description,html_url,owner:{avatar_url}} = response.data;
 
+        this.repositories.push({
+            name,
+            description,
+            avatar_url,
+            html_url,
         });
+        //apagar texto input após salvar dados do repositório
+        this.inputEl.value = '';
+
         //chamada do metodo render
         this.render();
 
@@ -68,6 +74,7 @@ class App {
             //cria objeto a e inseri texto
             let linkEL = document.createElement('a');
             linkEL.setAttribute('target', '_blank');
+            linkEL.setAttribute('href',repo.html_url);
             linkEL.appendChild(document.createTextNode('Acessar'));
 
             //cria elemento li e insere no mesmos os objetos criados anteriormente
