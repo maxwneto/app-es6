@@ -6,7 +6,7 @@ class App {
     constructor() {
         //crio vetor para receber objetos/repositorios
         this.repositories = [];
-        
+
         //crio objeto que irá receber referencia do objeto existente no DOM
         this.formEL = document.querySelector('#repo-form');
         this.inputEl = document.querySelector('input[name=repository');
@@ -21,6 +21,18 @@ class App {
 
     }
 
+    setLoading(loading = true){
+        if(loading === true){
+            let loadingEl = document.createElement('span');
+            loadingEl.appendChild(document.createTextNode('Carregando'));
+            loadingEl.setAttribute('id','loading');
+
+            this.formEL.appendChild(loadingEl);
+        }else{
+            document.getElementById('loading').remove();
+        }
+    }
+
     //metodo repositorio  instancia objetos no vetor repositories
     async addRepository(event) {
         event.preventDefault();
@@ -28,31 +40,41 @@ class App {
         const repoInput = this.inputEl.value;
 
         //validar se input contém valor
-        if(repoInput.length === 0){
+        if (repoInput.length === 0) {
             return;
         }
 
-        const response = await api.get(`https://api.github.com/repos/${repoInput}`);
+        this.setLoading();
 
-        //logar no console dados do repositóiro
-        console.log(response);
+        try {
+            const response = await api.get(`https://api.github.com/repos/${repoInput}`);
 
-        //desestruturação
-        const {name,description,html_url,owner:{avatar_url}} = response.data;
+            /*logar no console dados do repositóiro
+            console.log(response);
+            */
+            //desestruturação
+            const { name, description, html_url, owner: { avatar_url } } = response.data;
 
-        this.repositories.push({
-            name,
-            description,
-            avatar_url,
-            html_url,
-        });
-        //apagar texto input após salvar dados do repositório
-        this.inputEl.value = '';
+            this.repositories.push({
+                name,
+                description,
+                avatar_url,
+                html_url,
+            });
+            //apagar texto input após salvar dados do repositório
+            this.inputEl.value = '';
 
-        //chamada do metodo render
-        this.render();
+            //chamada do metodo render
+            this.render();
 
-    }
+        }catch(err){
+            alert('O repositório não existe!');
+            this.inputEl.value = '';
+        }
+
+        this.setLoading(false);
+
+       }
     //metodo  que irá  inserir repositorio no form => ul
     render() {
         //atribui valores em branco para o formulário
@@ -66,7 +88,7 @@ class App {
             //cria objeto strong e inseri nome
             let titleEl = document.createElement('strong');
             titleEl.appendChild(document.createTextNode(repo.name));
-            
+
             //cria objeto p e insere descriçao
             let descriptionEL = document.createElement('p');
             descriptionEL.appendChild(document.createTextNode(repo.description));
@@ -74,7 +96,7 @@ class App {
             //cria objeto a e inseri texto
             let linkEL = document.createElement('a');
             linkEL.setAttribute('target', '_blank');
-            linkEL.setAttribute('href',repo.html_url);
+            linkEL.setAttribute('href', repo.html_url);
             linkEL.appendChild(document.createTextNode('Acessar'));
 
             //cria elemento li e insere no mesmos os objetos criados anteriormente
